@@ -1,0 +1,106 @@
+{
+  "name": "Extract CRX",
+  "short_name": "ExtractCRX",
+  "description": "Extract CRX - Download source code for browser extensions. Supports Chrome, Firefox, Opera, and Edge.",
+  "id": "/Extract-CRX",
+  "start_url": "/Extract-CRX",
+  "scope": "/Extract-CRX",
+  "dir": "auto",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#16100f",
+  "theme_color": "#f44234",
+  "lang": "en",
+  "categories": [
+    "developer",
+    "developer tools",
+    "download",
+    "extension",
+    "utilities"
+  ],
+
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+
+  "protocol_handlers": [
+    {
+      "protocol": "mailto",
+      "url": "./&tar=%s"
+    }
+  ],
+
+  "edge_side_panel": {},
+
+  "prefer_related_applications": false,
+
+  "icons": [
+    {
+      "src": "./favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icons/16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/144-maskable.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "./social.png",
+      "form_factor": "wide",
+      "sizes": "1440x810",
+      "type": "image/png",
+      "description": "ScreenShot Of Site's Upper Part."
+    },
+    {
+      "src": "./social_2.png",
+      "sizes": "720x1440",
+      "type": "image/png",
+      "description": "ScreenShot Of Site's Upper Part."
+    }
+  ]
+}

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Extract CRX - Download and inspect source code for browser extensions. Supports Chrome, Firefox, Opera, and Edge.">
+    <meta name="keywords" content="download CRX, download XPI, crx extractor, xpi extractor, unpack crx, crx to zip, xpi to zip, view extension code">
+
+    <script>
+        if ('serviceWorker' in navigator) { 
+            window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); }); 
+        }
+    </script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="canonical" href="https://mainroute-core.github.io/Extract-CRX">
+    <link rel="shortcut icon" type="image/x-icon" sizes="any" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/192.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="icons/apple-touch-icon.png">
+
+    <title>Extract CRX - Extension Downloader & Inspector</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="globalDropOverlay" class="global-drop-overlay" style="display: none;">
+        <div class="global-drop-content">
+            <span class="material-symbols-rounded drop-overlay-icon">upload_file</span>
+            <p class="drop-overlay-text">Drop extension file here to analyze</p>
+        </div>
+    </div>
+
+    <header class="md3-top-app-bar">
+        <div class="top-app-bar-container">
+                <img src="icons/64.png" alt="logo">
+                <span class="brand-title">Extract CRX</span>
+            </div>
+            <div class="top-app-bar-actions">
+                <button type="button" class="md3-icon-button" id="themeToggleButton" title="Toggle Light/Dark Theme">
+                    <span class="material-symbols-rounded">dark_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="md3-container">
+            <div class="md3-card main-card">
+                <div class="md3-tabs" role="tablist" aria-label="App Navigation">
+                    <button class="md3-tab active" id="tab-extract" role="tab" aria-selected="true" aria-controls="panel-extract" tabindex="0">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                        </svg>
+                        <span class="tab-label">Extract</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="md3-tab" id="tab-convert" role="tab" aria-selected="false" aria-controls="panel-convert" tabindex="-1">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 4h-2v2h2v-2zm0 4h-2v2h2v-2zm0-2h2v2h-2v-2zm4 4h-2v2h2v-2zm0-4h-2v2h2v-2z"/>
+                        </svg>
+                        <span class="tab-label">Convert</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                    <button class="md3-tab" id="tab-history" role="tab" aria-selected="false" aria-controls="panel-history" tabindex="-1">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                        </svg>
+                        <span class="tab-label">History</span>
+                        <div class="tab-indicator"></div>
+                    </button>
+                </div>
+                <div class="md3-panels">
+                    <section class="md3-panel active" id="panel-extract" role="tabpanel" aria-labelledby="tab-extract">
+                        <div class="panel-header">
+                            <h1 class="md3-title">Extract Source Code</h1>
+                            <p class="md3-subtitle">Download CRX, XPI, or ZIP formats directly from major browser extension stores</p>
+                        </div>
+
+                        <form id="extensionForm" novalidate>
+                            <div class="md3-segmented-button" role="radiogroup" aria-label="Select Browser Store">
+                                <input type="radio" id="chrome" name="browser" value="chrome" checked>
+                                <label for="chrome" class="segmented-item" title="Chrome Web Store">
+                                    <span class="browser-icon chrome-icon"></span>
+                                    <span class="segmented-label">Chrome</span>
+                                </label>
+
+                                <input type="radio" id="firefox" name="browser" value="firefox">
+                                <label for="firefox" class="segmented-item" title="Firefox Add-ons">
+                                    <span class="browser-icon firefox-icon"></span>
+                                    <span class="segmented-label">Firefox</span>
+                                </label>
+
+                                <input type="radio" id="opera" name="browser" value="opera">
+                                <label for="opera" class="segmented-item" title="Opera Add-ons">
+                                    <span class="browser-icon opera-icon"></span>
+                                    <span class="segmented-label">Opera</span>
+                                </label>
+
+                                <input type="radio" id="edge" name="browser" value="edge">
+                                <label for="edge" class="segmented-item" title="Edge Add-ons">
+                                    <span class="browser-icon edge-icon"></span>
+                                    <span class="segmented-label">Edge</span>
+                                </label>
+                            </div>
+                            <div class="md3-textfield" id="inputContainer">
+                                <input type="text" id="extensionInput" required placeholder=" " autocomplete="off">
+                                <label for="extensionInput">Extension ID or URL</label>
+                                <button type="button" class="clear-input-btn" id="clearInput" aria-label="Clear Input" style="display: none;">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                    </svg>
+                                </button>
+                                <div class="helper-line">
+                                    <span class="error-text">Please enter a valid Extension ID or URL</span>
+                                </div>
+                            </div>
+                            <div class="md3-advanced-settings">
+                                <label class="md3-switch-container">
+                                    <input type="checkbox" id="corsProxyToggle" class="md3-switch-input">
+                                    <span class="md3-switch-thumb"></span>
+                                    <span class="md3-switch-label">Route via CORS Fallback Proxy</span>
+                                </label>
+                            </div>
+                            <div class="md3-select-container">
+                                <select id="downloadType" class="md3-select" aria-label="Select Download Format">
+                                    <option value="crx">Download as CRX</option>
+                                </select>
+                                <svg class="select-arrow" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5H7z"/>
+                                </svg>
+                            </div>
+                            <div class="md3-linear-progress" id="downloadProgressBar" role="progressbar" aria-hidden="true" style="display: none;">
+                                <div class="progress-track"></div>
+                                <div class="progress-indicator"></div>
+                            </div>
+                            <div class="md3-metadata-card" id="metadataCard" style="display: none;">
+                                <div class="metadata-icon-wrapper">
+                                    <div class="metadata-icon browser-icon" id="metaIcon"></div>
+                                </div>
+                                <div class="metadata-details">
+                                    <h3 class="metadata-title" id="metaTitle">Extension Name</h3>
+                                    <p class="metadata-version" id="metaVersion">Version: Unknown</p>
+                                </div>
+                            </div>
+                            <button type="submit" id="downloadButton" class="md3-btn-filled">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+                                </svg>
+                                <span class="btn-label">Start Download</span>
+                            </button>
+                        </form>
+                    </section>
+                    <section class="md3-panel" id="panel-convert" role="tabpanel" aria-labelledby="tab-convert" style="display: none;">
+                        <div class="panel-header">
+                            <h2 class="md3-title">Unpack & Inspect</h2>
+                            <p class="md3-subtitle">Convert CRX/XPI to ZIP files, or explore extension contents directly in your browser</p>
+                        </div>
+                        <div id="dropZone" class="md3-drop-zone">
+                            <input type="file" id="fileInput" accept=".crx, .xpi" hidden>
+                            <div class="drop-zone-content">
+                                <svg class="drop-icon" width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                                </svg>
+                                <p class="drop-primary-text">Drag & drop your file here</p>
+                                <p class="drop-secondary-text">Supports .crx or .xpi files</p>
+                                <button type="button" class="md3-btn-text" id="browseButton">Browse files</button>
+                            </div>
+                        </div>
+                        <div class="md3-file-card" id="selectedFileCard" style="display: none;">
+                            <svg class="file-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                            </svg>
+                            <div class="file-details">
+                                <span class="file-name" id="fileName">extension.crx</span>
+                                <span class="file-size" id="fileSize">0 KB</span>
+                            </div>
+                            <button type="button" class="md3-icon-button" id="removeFileButton" aria-label="Remove Selected File">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="md3-card audit-card" id="securityAuditCard" style="display: none;">
+                            <div class="audit-header">
+                                <span class="material-symbols-rounded audit-header-icon">gshield</span>
+                                <div class="audit-header-content">
+                                    <h3 class="audit-title">Security &amp; Manifest Audit</h3>
+                                    <p class="audit-subtitle">Local package configuration scan</p>
+                                </div>
+                                <span class="md3-badge" id="manifestVersionBadge">MV3</span>
+                            </div>
+                            <div class="audit-body">
+                                <div class="audit-metric-row">
+                                    <span class="metric-label">Permission Risk Level:</span>
+                                    <span class="risk-pill risk-low" id="riskLevelBadge">Low</span>
+                                </div>
+                                <div class="audit-section">
+                                    <h4 class="audit-section-title">Declared Permissions Analysis</h4>
+                                    <ul class="audit-list" id="permissionsAuditList">
+                                    </ul>
+                                </div>
+                                <div class="audit-section" id="migrationAuditSection" style="display: none;">
+                                    <h4 class="audit-section-title">Manifest V3 Migration Warnings</h4>
+                                    <ul class="audit-list" id="migrationWarningsList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="md3-explorer-container" id="explorerContainer" style="display: none;">
+                            <div class="explorer-header">
+                                <span class="explorer-title">Package Contents</span>
+                                <svg id="explorerCollapseAll" title="Collapse All" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="cursor: pointer;">
+                                    <path d="M7.41 18.59L8.83 20L12 16.83L15.17 20L16.59 18.59L12 14L7.41 18.59ZM16.59 5.41L15.17 4L12 7.17L8.83 4L7.41 5.41L12 10L16.59 5.41Z"/>
+                                </svg>
+                            </div>
+                            <div class="explorer-search-bar">
+                                <span class="material-symbols-rounded search-icon">filter_alt</span>
+                                <input type="text" id="treeSearchInput" placeholder="Filter files (e.g., manifest, background.js)..." autocomplete="off">
+                            </div>
+                            <div class="file-tree" id="fileTree" role="tree">
+                            </div>
+                        </div>
+                        <div class="convert-actions">
+                            <button id="convertButton" class="md3-btn-filled" disabled>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 4h-2v2h2v-2zm0 4h-2v2h2v-2zm0-2h2v2h-2v-2zm4 4h-2v2h2v-2zm0-4h-2v2h2v-2z"/>
+                                </svg>
+                                <span class="btn-label">Convert to ZIP</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="md3-panel" id="panel-history" role="tabpanel" aria-labelledby="tab-history" style="display: none;">
+                        <div class="panel-header">
+                            <div class="history-title-row">
+                                <h2 class="md3-title">Download History</h2>
+                                <button type="button" class="md3-btn-text" id="clearHistoryBtn" style="display: none;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
+                                    </svg>
+                                    <span>Clear All</span>
+                                </button>
+                            </div>
+                            <p class="md3-subtitle">Access previously extracted browser extensions</p>
+                        </div>
+
+                        <div id="historyPlaceholder" class="history-empty-state">
+                            <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                            <p class="empty-primary">No history yet</p>
+                            <p class="empty-secondary">Extensions you extract will appear here for quick access.</p>
+                        </div>
+
+                        <div id="historyList" class="md3-list" style="display: none;" role="list">
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="md3-footer">
+        <div class="footer-container">
+            <p class="footer-copyright">&copy; <span id="year">2026</span> Extract CRX &bull; <a href="https://MainRoute-Core.github.io/" target="_blank" rel="noopener">MainRoute Core</a>. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+    <div class="md3-dialog-backdrop" id="codeViewerDialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle" style="display: none;">
+        <div class="md3-dialog">
+            <header class="dialog-header">
+                <div class="dialog-title-group">
+                    <svg class="dialog-icon" id="dialogFileIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    </svg>
+                    <div class="dialog-title-wrapper">
+                        <h2 class="dialog-title" id="dialogTitle">file_name.js</h2>
+                        <span class="dialog-breadcrumbs" id="dialogBreadcrumbs">root/extension</span>
+                    </div>
+                </div>
+                <div class="dialog-actions-top">
+                    <button type="button" class="md3-icon-button" id="beautifyCodeButton" title="Beautify / Format Code">
+                        <span class="material-symbols-rounded">format_align_left</span>
+                    </button>
+                    <button type="button" class="md3-icon-button" id="downloadFileButton" title="Download This File">
+                        <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button type="button" class="md3-icon-button" id="copyCodeButton" title="Copy Content">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="md3-icon-button" id="closeDialogButton" aria-label="Close Code Viewer">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+            <div class="code-search-container" id="codeSearchContainer">
+                <span class="material-symbols-rounded code-search-icon">search</span>
+                <input type="text" id="codeSearchInput" placeholder="Find in file..." autocomplete="off">
+                <div class="code-search-controls">
+                    <span id="codeSearchCount" class="code-search-count">0 of 0</span>
+                    <button type="button" class="md3-icon-button small-btn" id="codeSearchPrev" title="Previous match">
+                        <span class="material-symbols-rounded">expand_less</span>
+                    </button>
+                    <button type="button" class="md3-icon-button small-btn" id="codeSearchNext" title="Next match">
+                        <span class="material-symbols-rounded">expand_more</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dialog-body">
+                <pre class="code-container" id="preContainer"><code id="codeViewerArea" class="code-box language-javascript"></code></pre>
+                <div class="media-preview-container" id="mediaPreviewContainer" style="display: none;">
+                    <div class="image-wrapper">
+                        <img id="imagePreview" src="" alt="Binary Image Preview">
+                    </div>
+                    <div class="image-meta">
+                        <span class="image-meta-text" id="imageResolution">0 x 0 pixels</span>
+                        <span class="image-meta-text" id="imageType">image/png</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/lib/jszip.min.js" defer></script>
+    <script src="js/lib/prism.min.js" defer></script>
+    <script src="js/lib/prism-css.min.js" defer></script>
+    <script src="js/lib/prism-javascript.min.js" defer></script>
+    <script src="js/lib/prism-json.min.js" defer></script>
+    <script defer src="js/index.js"></script>
+</body>
+
+</html>
