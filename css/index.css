@@ -130,7 +130,7 @@ body {
     margin: 0 auto;
     padding: 0 1.5rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -1391,11 +1391,6 @@ footer a:hover {
 
     .md3-title {
         font-size: 1.25rem;
-    }
-
-    .md3-segmented-button {
-        flex-direction: column;
-        border-radius: var(--md-shape-corner-large);
     }
 
     .segmented-item {
