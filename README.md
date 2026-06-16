@@ -1,6 +1,6 @@
 <h1 align="center">
 
-![Extract CRX](icons/512.png)
+![Extract CRX](icons/192.png)
 
 [Extract CRX](https://MainRoute-Core.github.io/Extract-CRX/)
 
