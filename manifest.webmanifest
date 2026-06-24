@@ -90,14 +90,14 @@
 
   "screenshots": [
     {
-      "src": "./src/social.png",
+      "src": "./src/social-.png",
       "form_factor": "wide",
       "sizes": "1440x810",
       "type": "image/png",
       "description": "ScreenShot Of Site's Upper Part."
     },
     {
-      "src": "./src/social_2.png",
+      "src": "./src/social_.png",
       "sizes": "720x1480",
       "type": "image/png",
       "description": "ScreenShot Of Site's Upper Part."
